@@ -8,4 +8,6 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('user-profile/<str:username>/', UserProfileUpdateView.as_view(), name='user-profile'),
     path('update-profile/<str:username>/', UserProfileUpdateView.as_view(), name='update-profile'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
