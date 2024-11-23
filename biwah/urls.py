@@ -1,13 +1,14 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import UserProfileUpdateView, UserLoginView, UserRegisterView
+from .views import UserProfileUpdateView, UserLoginView, UserRegisterView, MatchmakingView
 
 urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('user-profile/<str:username>/', UserProfileUpdateView.as_view(), name='user-profile'),
     path('update-profile/<str:username>/', UserProfileUpdateView.as_view(), name='update-profile'),
+    path('matchmaking/<str:username>/', MatchmakingView.as_view(), name='matchmaking'),  
 ] 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

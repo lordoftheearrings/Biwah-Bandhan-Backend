@@ -82,7 +82,7 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError("Unsupported image format. Only JPEG, PNG, and JPG are allowed.")
 
                 # Check image size (e.g., limit to 5 MB)
-                if image_data.size > 5 * 1024 * 1024:  # 5 MB limit
+                if image_data.size > 10 * 1024 * 1024:  # 5 MB limit
                     raise serializers.ValidationError("Image file is too large. Maximum size is 5 MB.")
 
                 file_name = f"{prefix}_{instance.username}.{ext}"

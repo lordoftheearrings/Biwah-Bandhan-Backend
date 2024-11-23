@@ -2,12 +2,10 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password, check_password
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.files.base import ContentFile
 from django.conf import settings
 from .models import UserDatabase
 from .serializers import UserDatabaseSerializer
-import base64
+from .weighted_score import calculate_weighted_score  # Import matchmaking logic
 import os
 
 # Helper to construct full image URLs
@@ -38,13 +36,11 @@ class UserLoginView(APIView):
         password = request.data.get('password')
 
         if not username or not password:
-            return Response({
-                "message": "Username and password are required"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Username and password are required"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = UserDatabase.objects.get(username=username)
-
             if check_password(password, user.password):
                 return Response({
                     "message": "Logged in successfully!",
@@ -62,10 +58,11 @@ class UserLoginView(APIView):
                     }
                 }, status=status.HTTP_200_OK)
             else:
-                return Response({"message": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
-
+                return Response({"message": "Invalid password"},
+                                status=status.HTTP_400_BAD_REQUEST)
         except UserDatabase.DoesNotExist:
-            return Response({"message": "Invalid username"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Invalid username"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 # Profile Update View
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
@@ -77,47 +74,33 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
         instance = self.get_object()
         partial = kwargs.pop('partial', False)
 
-        # Debugging: Print incoming request data to check what is being received
-        print("Request Data:", request.data)
-
-        # Handle image fields (either file upload)
         profile_image = request.FILES.get('profile_image', None)
         cover_image = request.FILES.get('cover_image', None)
 
-        # Handle profile image (file upload)
+        # Handle profile image upload
         if profile_image:
-            # Remove old profile image if exists
             if instance.profile_image:
                 try:
                     os.remove(instance.profile_image.path)
                 except FileNotFoundError:
                     pass
-            
-            # Save the uploaded file
             instance.profile_image = profile_image
-            file_name = f"profile_{instance.username}.jpg"
-            instance.profile_image.name = file_name  # Ensure the file name is correct
 
-        # Handle cover image (file upload)
+        # Handle cover image upload
         if cover_image:
-            # Remove old cover image if exists
             if instance.cover_image:
                 try:
                     os.remove(instance.cover_image.path)
                 except FileNotFoundError:
                     pass
-            
-            # Save the uploaded file
             instance.cover_image = cover_image
-            file_name = f"cover_{instance.username}.jpg"
-            instance.cover_image.name = file_name  # Ensure the file name is correct
 
-        # Update other fields (name, phone number, etc.)
+        # Update other fields
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if not serializer.is_valid():
-            print(f"Validation Errors: {serializer.errors}")  # Log validation errors
-            return Response({"message": "Validation failed", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response({"message": "Validation failed", "errors": serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
         self.perform_update(serializer)
 
         return Response({
@@ -135,3 +118,38 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 "name": instance.name,
             }
         }, status=status.HTTP_200_OK)
+
+# Matchmaking View
+class MatchmakingView(APIView):
+    def get(self, request, username):
+        try:
+            current_user = UserDatabase.objects.get(username=username)
+        except UserDatabase.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Exclude current user from potential matches
+        potential_matches = UserDatabase.objects.exclude(username=username)
+        
+        # Define example weights (customize based on your app logic)
+        weights = {
+            'age': 0.4,
+            'religion': 0.3,
+            'caste': 0.2,
+            # Add more criteria as needed
+        }
+
+        matches = []
+        for user in potential_matches:
+            compatibility_score = calculate_weighted_score(current_user, user, weights)
+            matches.append({
+                'username': user.username,
+                'name': user.name,
+                'score': compatibility_score,
+                'profile_image': build_image_url(user.profile_image),
+                'bio': user.bio
+            })
+
+        # Sort matches by score in descending order
+        sorted_matches = sorted(matches, key=lambda x: x['score'], reverse=True)
+
+        return Response({"matches": sorted_matches}, status=status.HTTP_200_OK)
