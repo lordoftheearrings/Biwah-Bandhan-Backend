@@ -4,6 +4,7 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import make_password
 from .models import UserDatabase
 import os
+import re
 
 class UserDatabaseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,13 +12,16 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
         fields = [
             'username', 
             'password', 
+            'name',
+            'religion',
+            'caste',
             'phone_number', 
             'age', 
             'gender', 
             'bio', 
             'profile_image', 
             'cover_image', 
-            'name'
+            
         ]
         extra_kwargs = {
             'password': {'write_only': True},
@@ -28,6 +32,8 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
             'gender': {'required': False},
             'bio': {'required': False},
             'name': {'required': False},
+            'religion':{'required': False},
+            'caste':{'required': False}
         }
 
     def create(self, validated_data):
@@ -81,20 +87,29 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
                 if ext.lower() not in allowed_formats:
                     raise serializers.ValidationError("Unsupported image format. Only JPEG, PNG, and JPG are allowed.")
 
-                # Check image size (e.g., limit to 5 MB)
-                if image_data.size > 10 * 1024 * 1024:  # 5 MB limit
-                    raise serializers.ValidationError("Image file is too large. Maximum size is 5 MB.")
+                # Check image size (e.g., limit to 10 MB)
+                if image_data.size > 10 * 1024 * 1024:  # 10 MB limit
+                    raise serializers.ValidationError("Image file is too large. Maximum size is 10 MB.")
 
-                file_name = f"{prefix}_{instance.username}.{ext}"
+                # Ensure username is available
+                username = instance.username if instance.username else "default"
+
+                # Create a file name with the prefix and username
+                file_name = f"{prefix}_{username}.{ext}"
 
                 # Save the file to the model field
-                getattr(instance, field_name).save(
-                    file_name,
-                    image_data
-                )
+                image_field = getattr(instance, field_name)
+                image_field.save(file_name, image_data)
         except Exception as e:
             raise serializers.ValidationError(f"Error processing image: {str(e)}")
-
+    
+    def validate_phone_number(self, value):
+        """
+        Validate phone number format (e.g., only numeric characters, correct length).
+        """
+        if value and not re.match(r'^\d{0,15}$', value):
+            raise serializers.ValidationError("Phone number must be numeric and between 10 to 15 digits.")
+        return value
     # Optionally, validate file upload (could be handled by _save_image, but can be split for clarity)
     def validate_profile_image(self, value):
         return value

@@ -8,7 +8,7 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('user-profile/<str:username>/', UserProfileUpdateView.as_view(), name='user-profile'),
     path('update-profile/<str:username>/', UserProfileUpdateView.as_view(), name='update-profile'),
-    path('matchmaking/<str:username>/', MatchmakingView.as_view(), name='matchmaking'),  
+    path('weighted_score/<str:username>/', MatchmakingView.as_view(), name='weighted_score'),  
 ] 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

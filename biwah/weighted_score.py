@@ -1,29 +1,28 @@
 from .models import UserDatabase
 
-def calculate_weighted_score(current_user, potential_match, weights):
+def calculate_weighted_score(user, profile, weights):
     score = 0
 
-    # Age Matching
-    if 'age' in weights:
-        # Ensure that age is not None, default to 0 if missing
-        current_user_age = current_user.age if current_user.age is not None else 0
-        potential_match_age = potential_match.age if potential_match.age is not None else 0
-        
-        # Normalize age difference (assuming max difference is 20 years)
-        age_diff = abs(current_user_age - potential_match_age)
-        age_score = 1 - (age_diff / 20)  # Normalize between 0 and 1
-        score += weights['age'] * max(0, age_score)  # Prevent negative scores
+    # Age difference condition
+    age_difference = abs(user.age - profile.age)  # Calculate absolute age difference
+    if age_difference <= 3:
+        score += weights['age'] * 3  # If age difference is 2 or less, give a high score
+    elif age_difference <= 6:
+        score += weights['age']  # If age difference is 3-5, give a medium score
+    else:
+        score += weights['age'] * 0.2  # If age difference is greater than 5, give a lower score
 
-    # Gender Matching (only opposite gender)
-    if 'gender' in weights:
-        gender_match = 0  # Default no match
-        if current_user.gender == 'male' and potential_match.gender == 'female':
-            gender_match = 1
-        elif current_user.gender == 'female' and potential_match.gender == 'male':
-            gender_match = 1
-        elif current_user.gender == 'other' and potential_match.gender != 'other':
-            gender_match = 1  # If user is 'other', show opposite gender
-        
-        score += weights['gender'] * gender_match
+    # Religion condition
+    if profile.religion == user.religion:
+        score += weights['religion']  # Match on religion
+
+    # Caste condition
+    if profile.caste == user.caste:
+        score += weights['caste']  # Match on caste
+
+    # You can add more conditions here, for example:
+    # - Education level
+    # - Interests or hobbies
+    # - Location proximity (if you want to use geo-location)
 
     return score

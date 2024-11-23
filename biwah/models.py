@@ -3,7 +3,7 @@ from django.db import models
 class UserDatabase(models.Model):
     username = models.CharField(max_length=100, unique=True)  # Username must be unique
     password = models.CharField(max_length=100)  # Password is hashed; plaintext should never be stored
-    phone_number = models.IntegerField(null=True, blank=True)  # Optional phone number
+    phone_number = models.CharField(max_length=15,null=True, blank=True)  # Optional phone number
     age = models.IntegerField(null=True, blank=True)  # Optional age
     gender = models.CharField(
         max_length=10, 

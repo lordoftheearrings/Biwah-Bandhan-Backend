@@ -120,36 +120,46 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
         }, status=status.HTTP_200_OK)
 
 # Matchmaking View
+
 class MatchmakingView(APIView):
+
     def get(self, request, username):
+        # Extract offset and limit for pagination (default to 0 and 10)
+        offset = int(request.query_params.get('offset', 0))
+        limit = int(request.query_params.get('limit', 10))
+
         try:
+            # Get the current user
             current_user = UserDatabase.objects.get(username=username)
         except UserDatabase.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Exclude current user from potential matches
-        potential_matches = UserDatabase.objects.exclude(username=username)
+        # Determine the opposite gender
+        if current_user.gender == 'Male':
+            opposite_gender = 'Female'
+        else:
+            opposite_gender = 'Male'
+
+        # Exclude the current user and filter by opposite gender
+        potential_matches = UserDatabase.objects.exclude(username=username).filter(gender=opposite_gender).order_by('?')[offset:offset + limit]
         
-        # Define example weights (customize based on your app logic)
+
+        
+
+        # Calculate scores for potential matches
         weights = {
-            'age': 0.4,
-            'religion': 0.3,
-            'caste': 0.2,
-            # Add more criteria as needed
+            'age': 10,
+            'religion': 5,
+            'caste': 5,
         }
 
         matches = []
         for user in potential_matches:
-            compatibility_score = calculate_weighted_score(current_user, user, weights)
-            matches.append({
-                'username': user.username,
-                'name': user.name,
-                'score': compatibility_score,
-                'profile_image': build_image_url(user.profile_image),
-                'bio': user.bio
-            })
+            score = calculate_weighted_score(current_user, user, weights)
+            matches.append({'username': user.username, 'score': score})
 
-        # Sort matches by score in descending order
-        sorted_matches = sorted(matches, key=lambda x: x['score'], reverse=True)
+        # Sort matches by compatibility score (ascending order for best matches)
+        sorted_matches = sorted(matches, key=lambda x: x['score'])
 
-        return Response({"matches": sorted_matches}, status=status.HTTP_200_OK)
+        # Return only the usernames
+        return Response({"matches": [match['username'] for match in sorted_matches]}, status=status.HTTP_200_OK)
