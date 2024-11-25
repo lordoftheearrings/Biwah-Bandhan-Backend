@@ -14,7 +14,7 @@ def generate_fake_user_data(num_users):
         name = fake.name()
         bio = fake.text(max_nb_chars=50)
         age = random.randint(18, 55)  
-        gender = random.choice([ 'Female','Other','Male'])
+        gender = random.choice([ 'Other'])
         caste = random.choice(['Newar', 'Brahmin', 'Chhetri'])  # Update with actual options
         religion = random.choice(['Hindu', 'Muslim', 'Christian','Buddhism','Jewish'])  # Update with actual options
         phone_number = random.randint(1000000000, 9999999999)

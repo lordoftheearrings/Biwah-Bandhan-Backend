@@ -10,7 +10,7 @@ def calculate_weighted_score(user, profile, weights):
     elif age_difference <= 6:
         score += weights['age']  # If age difference is 3-5, give a medium score
     else:
-        score += weights['age'] * 0.2  # If age difference is greater than 5, give a lower score
+        score += weights['age'] * 0.1  # If age difference is greater than 5, give a lower score
 
     # Religion condition
     if profile.religion == user.religion:

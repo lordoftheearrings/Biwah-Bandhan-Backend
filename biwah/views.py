@@ -107,6 +107,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             "message": "Profile updated successfully!",
             "user": {
                 "username": instance.username,
+                "name": instance.name,
                 "phone_number": instance.phone_number,
                 "age": instance.age,
                 "gender": instance.gender,
@@ -115,7 +116,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 "bio": instance.bio,
                 "profile_image": build_image_url(instance.profile_image),
                 "cover_image": build_image_url(instance.cover_image),
-                "name": instance.name,
+                
             }
         }, status=status.HTTP_200_OK)
 
@@ -126,7 +127,7 @@ class MatchmakingView(APIView):
     def get(self, request, username):
         # Extract offset and limit for pagination (default to 0 and 10)
         offset = int(request.query_params.get('offset', 0))
-        limit = int(request.query_params.get('limit', 10))
+        limit = int(request.query_params.get('limit', 15))
 
         try:
             # Get the current user
@@ -135,13 +136,17 @@ class MatchmakingView(APIView):
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         # Determine the opposite gender
+        # Determine the opposite gender
         if current_user.gender == 'Male':
             opposite_gender = 'Female'
-        else:
+        elif current_user.gender == 'Female':
             opposite_gender = 'Male'
+        else:  # For 'Other'
+            opposite_gender = 'Other'
 
-        # Exclude the current user and filter by opposite gender
+# Exclude the current user and filter by opposite gender
         potential_matches = UserDatabase.objects.exclude(username=username).filter(gender=opposite_gender).order_by('?')[offset:offset + limit]
+
         
 
         
@@ -149,7 +154,7 @@ class MatchmakingView(APIView):
         # Calculate scores for potential matches
         weights = {
             'age': 10,
-            'religion': 5,
+            'religion': 10,
             'caste': 5,
         }
 
