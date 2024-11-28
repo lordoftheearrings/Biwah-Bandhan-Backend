@@ -71,7 +71,7 @@ def generate_kundali_svg(year, month, day, hour, minute, second, latitude, longi
     )
 
     # Create the LagnaChart object with the correct chartname and personname
-    mychart = chart.LagnaChart("Lagna", "User")  # Replace "User" with the actual person's name
+    mychart = chart.LagnaChart("Lagna", "User", IsFullChart= True)  # Replace "User" with the actual person's name
 
     # Set the Ascendant sign
     mychart.set_ascendantsign(ascendant)
@@ -123,10 +123,14 @@ def generate_kundali_svg(year, month, day, hour, minute, second, latitude, longi
 
     file_name = f"{username}_kundali_"
     base_file_path = os.path.join(output_dir, file_name)
+    
 
     # Generate the Kundali SVG
     mychart.draw(output_dir, file_name)  # This will create both `file_name` and `file_name.svg`
 
+    base_file_path_without_ext = os.path.join(output_dir, file_name)  # Base file path
+    if os.path.exists(base_file_path_without_ext):
+        os.remove(base_file_path_without_ext)
     # Add .svg extension to the base file path
     svg_file_path = f"{base_file_path}.svg"
 
@@ -173,24 +177,17 @@ class GenerateKundaliView(APIView):
         user.birth_longitude = longitude
         user.kundali_svg = kundali_svg_file_path
         user.save()
+        
 
         cache.clear()
 
-        # Read and return the SVG content
-        with open(kundali_svg_file_path, 'r') as svg_file:
-            svg_content = svg_file.read()
-        svg_content = svg_content.lstrip('\ufeffÿþ').lstrip('\ufeffÿþ')
-        print(svg_content)
+        
+        
         return Response({
-            "message": "Kundali generated and saved",
-            "kundali_svg_content": svg_content,  # Pass the SVG content to the frontend
+            "Kundali Saved"  # Pass the SVG content to the frontend
         }, status=status.HTTP_200_OK)
     
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import UserDatabase
-import os
+
 
 class RetrieveKundali(APIView):
     def post(self, request, *args, **kwargs):
@@ -215,15 +212,15 @@ class RetrieveKundali(APIView):
             file_path = kundali_svg.path # This gets the local file system path to the file
             
             # Open and read the SVG file from the file system path
-            with open(file_path, 'r') as svg_file:
+            with open(file_path, 'r',encoding='utf-16') as svg_file:
                 svg_content = svg_file.read()
 
             # Remove BOM characters (if any)
-            svg_content = svg_content.lstrip('\ufeff').lstrip('\ufeff')
+            svg_content = svg_content.lstrip('ÿþ')
             
             # Return the SVG content as a response
             return Response({
-                "kundali_svg_content": svg_content}, status=status.HTTP_200_OK)
+                svg_content}, status=status.HTTP_200_OK)
 
         except Exception as e:
             # Handle errors (e.g., file not found, read error)

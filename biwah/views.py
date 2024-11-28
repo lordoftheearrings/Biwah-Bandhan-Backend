@@ -117,6 +117,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 "bio": instance.bio,
                 "profile_image": build_image_url(instance.profile_image),
                 "cover_image": build_image_url(instance.cover_image),
+                "kundali_svg":instance.kundali_svg,
                 
             }
         }, status=status.HTTP_200_OK)

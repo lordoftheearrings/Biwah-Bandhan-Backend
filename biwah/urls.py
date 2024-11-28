@@ -17,7 +17,7 @@ urlpatterns = [
     path('update-profile/<str:username>/', UserProfileUpdateView.as_view(), name='update-profile'),
     path('weighted_score/<str:username>/', MatchmakingView.as_view(), name='weighted_score'),  
     path('generate_kundali/', GenerateKundaliView.as_view(), name='generate_kundali'),
-    path('retrieve_kundali/<str:username>/',RetrieveKundali.as_view(),name='retrieve_kundali'),
+    path('retrieve_kundali/',RetrieveKundali.as_view(),name='retrieve_kundali'),
     path('ashtakoot/', AshtakootGunMilan.as_view(), name='ashtakoot'),  
     
 ]
