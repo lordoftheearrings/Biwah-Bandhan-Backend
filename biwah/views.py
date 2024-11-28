@@ -5,8 +5,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from .models import UserDatabase
 from .serializers import UserDatabaseSerializer
-from .weighted_score import calculate_weighted_score  # Import matchmaking logic
+from .weighted_score import calculate_weighted_score  
 import os
+from kundali.Kundali import generate_kundali_svg
 
 # Helper to construct full image URLs
 def build_image_url(image_field):
@@ -168,3 +169,7 @@ class MatchmakingView(APIView):
 
         # Return only the usernames
         return Response({"matches": [match['username'] for match in sorted_matches]}, status=status.HTTP_200_OK)
+    
+
+
+

@@ -19,5 +19,17 @@ class UserDatabase(models.Model):
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)  
     cover_image = models.ImageField(upload_to='cover_images/', blank=True, null=True)  
 
+    # Kundali Info          
+    birth_year = models.IntegerField(null=True, blank=True)
+    birth_month = models.IntegerField(null=True, blank=True)
+    birth_date = models.IntegerField(null=True, blank=True)
+    birth_hour = models.IntegerField(null=True, blank=True)
+    birth_minute = models.IntegerField(null=True, blank=True)
+    birth_second = models.IntegerField(null=True, blank=True)
+    birth_location = models.CharField(max_length=255, null=True, blank=True)
+    birth_latitude = models.FloatField(null=True, blank=True)
+    birth_longitude = models.FloatField(null=True, blank=True)
+    kundali_svg = models.FileField(max_length=255,upload_to='kundali_svgs/', blank=True, null=True)     
+
     def __str__(self):
         return self.username

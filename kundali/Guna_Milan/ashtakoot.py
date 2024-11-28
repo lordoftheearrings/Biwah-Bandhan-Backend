@@ -1,0 +1,115 @@
+VARNA = {
+    "getClass": lambda moonsign: 0 if moonsign in [4, 8, 12] else 1 if moonsign in [1, 5, 9] else 2 if moonsign in [2, 6, 10] else 3,
+    "points": [[1, 0, 0, 0], [1, 1, 0, 0], [1, 1, 1, 0], [1, 1, 1, 1]]
+}
+
+VASYA = {
+    "getGroup": lambda moonsign: 0 if moonsign in [3, 6, 7, 9, 11] else 1 if moonsign == 5 else 2 if moonsign in [1, 2, 10] else 3 if moonsign in [4, 10, 12] else 4,
+    "points": [[2, 0.5, 1, 0, 2], [0.5, 2, 0, 0, 0], [1, 0, 2, 2, 2], [0, 0, 2, 2, 0], [1, 0, 1, 0, 2]]
+}
+
+TARA = {
+    "getTaraGroup": lambda nakshatra: nakshatra - 1 if nakshatra < 10 else int(str(nakshatra)[-1]) if nakshatra <= 18 else int(str(nakshatra)[-1]) + 1 if nakshatra > 19 else 0,
+    "points": [
+        [3, 3, 1.5, 3, 1.5, 3, 1.5, 3, 3],
+        [3, 3, 1.5, 3, 1.5, 3, 1.5, 3, 3],
+        [1.5, 1.5, 0, 1.5, 0, 1.5, 0, 1.5, 1.5],
+        [3, 3, 1.5, 3, 1.5, 3, 1.5, 3, 3],
+        [1.5, 1.5, 0, 1.5, 0, 1.5, 0, 1.5, 1.5],
+        [3, 3, 1.5, 3, 1.5, 3, 1.5, 3, 3],
+        [1.5, 1.5, 0, 1.5, 0, 1.5, 0, 1, 1],
+        [3, 3, 1.5, 3, 1.5, 3, 1.5, 3, 3],
+        [3, 3, 1.5, 3, 1.5, 3, 1.5, 3, 3]
+    ]
+}
+
+YONI = {
+    "getAnimal": lambda nakshatra: {
+        1: 0, 2: 1, 3: 2, 4: 3, 5: 3, 6: 4, 7: 5, 8: 2, 9: 5, 10: 6, 11: 6, 12: 7, 13: 8, 14: 9, 15: 8, 16: 9, 17: 11, 18: 10, 19: 4, 20: 11, 21: 12, 22: 11, 23: 13, 24: 0, 25: 13, 26: 7, 27: 1, 28: 12
+    }[nakshatra],
+    "points": [
+        [4, 2, 2, 3, 2, 2, 2, 1, 0, 1, 1, 3, 2, 1],
+        [2, 4, 3, 3, 2, 2, 2, 2, 3, 1, 2, 3, 2, 0],
+        [2, 3, 4, 3, 2, 2, 2, 2, 3, 1, 2, 3, 2, 0],
+        [3, 3, 2, 4, 2, 1, 1, 1, 1, 2, 2, 2, 0, 2],
+        [2, 2, 1, 2, 4, 2, 1, 2, 2, 1, 0, 2, 1, 1],
+        [2, 2, 2, 1, 2, 4, 0, 2, 2, 1, 3, 3, 2, 1],
+        [2, 2, 1, 1, 1, 0, 4, 2, 2, 2, 2, 2, 1, 2],
+        [1, 2, 3, 1, 2, 2, 2, 4, 3, 0, 3, 2, 2, 1],
+        [0, 3, 3, 1, 2, 2, 2, 3, 4, 1, 2, 2, 2, 2],
+        [1, 1, 1, 2, 1, 1, 2, 0, 1, 4, 1, 1, 2, 1],
+        [1, 2, 2, 2, 0, 3, 2, 3, 2, 1, 4, 2, 2, 1],
+        [3, 3, 0, 2, 2, 3, 2, 2, 2, 1, 2, 4, 3, 2],
+        [2, 2, 3, 0, 1, 2, 1, 2, 2, 2, 2, 3, 4, 2],
+        [1, 0, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 4]
+    ]
+}
+
+GRAH_MAITRI = {
+    "getSignLord": lambda moonsign: {
+        5: 0, 4: 1, 1: 2, 8: 2, 3: 3, 6: 3, 9: 4, 12: 4, 2: 5, 7: 5, 10: 6, 11: 6
+    }[moonsign],
+    "points": [
+        [5, 5, 5, 4, 5, 0, 0],
+        [5, 5, 4, 1, 4, 0.5, 0.5],
+        [5, 4, 5, 0.5, 5, 3, 0.5],
+        [4, 1, 0.5, 5, 0.5, 5, 4],
+        [5, 4, 5, 0.5, 5, 0.5, 5, 4],
+        [5, 4, 5, 0.5, 5, 0.5, 3],
+        [0, 0.5, 3, 5, 0.5, 5, 5],
+        [0, 0.5, 0.5, 4, 3, 5, 5]
+    ]
+}
+
+GANA = {
+    "getTemperament": lambda nakshatra: 0 if nakshatra in [1, 5, 7, 8, 13, 15, 17, 22, 27] else 1 if nakshatra in [2, 4, 6, 11, 12, 20, 21, 25, 26] else 2,
+    "points": [[6, 3, 1], [5, 6, 3], [0, 0, 6]]
+}
+
+BHAKOOT = {
+    "points": [
+        [7, 0, 7, 7, 0, 0, 7, 0, 0, 7, 7, 0],
+        [0, 7, 0, 7, 7, 0, 0, 7, 0, 0, 7, 7],
+        [7, 0, 7, 0, 7, 7, 0, 0, 7, 0, 0, 7],
+        [7, 7, 0, 7, 0, 7, 7, 0, 0, 7, 0, 0],
+        [0, 7, 7, 0, 7, 0, 7, 7, 0, 0, 7, 0],
+        [0, 0, 7, 7, 0, 7, 0, 7, 7, 0, 0, 7],
+        [7, 0, 0, 7, 7, 0, 7, 0, 7, 7, 0, 0],
+        [0, 7, 0, 0, 7, 7, 0, 7, 0, 7, 7, 0],
+        [0, 0, 7, 0, 0, 7, 7, 0, 7, 0, 7, 7],
+        [7, 0, 0, 7, 0, 0, 7, 7, 0, 7, 0, 7],
+        [7, 7, 0, 7, 7, 0, 0, 7, 7, 0, 7, 0],
+        [0, 7, 7, 0, 0, 7, 0, 0, 7, 7, 0, 7]
+    ]
+}
+
+NADI = {
+    "getNadiGroup": lambda nakshatra: 0 if nakshatra in [1, 6, 7, 12, 13, 18, 19, 24, 25] else 1 if nakshatra in [2, 5, 8, 11, 14, 17, 20, 23, 26] else 2,
+    "points": [[0, 8, 8], [8, 0, 8], [8, 8, 0]]
+}
+
+
+def get_guna_milan_points(girl, boy):
+    varna = VARNA["points"][VARNA["getClass"](girl["moonsign"] - 1)][VARNA["getClass"](boy["moonsign"] - 1)]
+    vasya = VASYA["points"][VASYA["getGroup"](girl["moonsign"] - 1)][VASYA["getGroup"](boy["moonsign"] - 1)]
+    tara = TARA["points"][TARA["getTaraGroup"](girl["nakshatra"] - 1)][TARA["getTaraGroup"](boy["nakshatra"] - 1)]
+    yoni = YONI["points"][YONI["getAnimal"](girl["nakshatra"] - 1)][YONI["getAnimal"](boy["nakshatra"] - 1)]
+    grah = GRAH_MAITRI["points"][GRAH_MAITRI["getSignLord"](girl["moonsign"] )][GRAH_MAITRI["getSignLord"](boy["moonsign"] )]
+    gana = GANA["points"][GANA["getTemperament"](girl["nakshatra"] - 1)][GANA["getTemperament"](boy["nakshatra"] - 1)]
+    bhakoot = BHAKOOT["points"][girl["moonsign"] - 1][boy["moonsign"] - 1]
+    nadi = NADI["points"][NADI["getNadiGroup"](girl["nakshatra"] - 1)][NADI["getNadiGroup"](boy["nakshatra"] - 1)]
+
+    total = varna + vasya + tara + yoni + grah + gana + bhakoot + nadi
+
+    return {
+        "varna": varna,
+        "vasya": vasya,
+        "tara": tara,
+        "yoni": yoni,
+        "grah": grah,
+        "gana": gana,
+        "bhakoot": bhakoot,
+        "nadi": nadi,
+        "total": total
+    }
+

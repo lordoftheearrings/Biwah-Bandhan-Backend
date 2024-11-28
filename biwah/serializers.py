@@ -21,7 +21,16 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
             'bio', 
             'profile_image', 
             'cover_image', 
-            
+            'birth_year',
+            'birth_month',
+            'birth_date',
+            'birth_hour',
+            'birth_minute',
+            'birth_second',
+            'birth_location',
+            'birth_latitude',
+            'birth_longitude',
+            'kundali_svg',  # Field for storing the Kundali SVG data
         ]
         extra_kwargs = {
             'password': {'write_only': True},
@@ -32,8 +41,18 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
             'gender': {'required': False},
             'bio': {'required': False},
             'name': {'required': False},
-            'religion':{'required': False},
-            'caste':{'required': False}
+            'religion': {'required': False},
+            'caste': {'required': False},
+            'birth_year': {'required': False},
+            'birth_month': {'required': False},
+            'birth_date': {'required': False},
+            'birth_hour': {'required': False},
+            'birth_minute': {'required': False},
+            'birth_second': {'required': False},
+            'birth_location': {'required': False},
+            'birth_latitude': {'required': False},
+            'birth_longitude': {'required': False},
+            'kundali_svg': {'required': False},  # New field for storing SVG
         }
 
     def create(self, validated_data):
@@ -41,8 +60,8 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         validated_data['password'] = make_password(password)
 
-        # Create user instance and handle images
-        return self._handle_images(UserDatabase.objects.create(**validated_data), validated_data)
+        # Create user instance and handle images and kundali data
+        return self._handle_images_and_kundali(UserDatabase.objects.create(**validated_data), validated_data)
 
     def update(self, instance, validated_data):
         # Hash password if provided
@@ -54,22 +73,30 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
-        # Handle images
-        return self._handle_images(instance, validated_data)
+        # Handle images and kundali data
+        return self._handle_images_and_kundali(instance, validated_data)
 
-    def _handle_images(self, instance, validated_data):
+    def _handle_images_and_kundali(self, instance, validated_data):
         """
-        Handle image file uploads.
+        Handle image file uploads and saving of Kundali SVG data.
         """
+        # Handle profile image
         if 'profile_image' in validated_data:
             profile_image_data = validated_data['profile_image']
             if profile_image_data:
                 self._save_image(instance, 'profile_image', profile_image_data, 'profile')
 
+        # Handle cover image
         if 'cover_image' in validated_data:
             cover_image_data = validated_data['cover_image']
             if cover_image_data:
                 self._save_image(instance, 'cover_image', cover_image_data, 'cover')
+
+        # Handle Kundali SVG if present
+        if 'kundali_svg' in validated_data:
+            kundali_svg_data = validated_data['kundali_svg']
+            if kundali_svg_data:
+                instance.kundali_svg = kundali_svg_data
 
         instance.save()
         return instance
@@ -102,7 +129,7 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
                 image_field.save(file_name, image_data)
         except Exception as e:
             raise serializers.ValidationError(f"Error processing image: {str(e)}")
-    
+
     def validate_phone_number(self, value):
         """
         Validate phone number format (e.g., only numeric characters, correct length).
@@ -110,9 +137,29 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
         if value and not re.match(r'^\d{0,15}$', value):
             raise serializers.ValidationError("Phone number must be numeric and between 10 to 15 digits.")
         return value
-    # Optionally, validate file upload (could be handled by _save_image, but can be split for clarity)
+
     def validate_profile_image(self, value):
         return value
 
     def validate_cover_image(self, value):
         return value
+
+
+class GunaMilanSerializer(serializers.Serializer):
+    year_boy = serializers.IntegerField()
+    month_boy = serializers.IntegerField()
+    day_boy = serializers.IntegerField()
+    hour_boy = serializers.IntegerField()
+    minute_boy = serializers.IntegerField()
+    second_boy = serializers.IntegerField()
+    latitude_boy = serializers.FloatField()
+    longitude_boy = serializers.FloatField()
+
+    year_girl = serializers.IntegerField()
+    month_girl = serializers.IntegerField()
+    day_girl = serializers.IntegerField()
+    hour_girl = serializers.IntegerField()
+    minute_girl = serializers.IntegerField()
+    second_girl = serializers.IntegerField()
+    latitude_girl = serializers.FloatField()
+    longitude_girl = serializers.FloatField()
