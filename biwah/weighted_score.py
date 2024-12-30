@@ -1,4 +1,4 @@
-from .models import UserDatabase
+from .models import User
 
 def calculate_weighted_score(user, profile, weights):
     score = 0
