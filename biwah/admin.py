@@ -1,25 +1,52 @@
 from django.contrib import admin
-from .models import User,Profile,Kundali
+from .models import UserDatabase
 
 
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('username',)  # Display the username in the list view
-    search_fields = ('username',)  # Allow search by username
+class UserDatabaseAdmin(admin.ModelAdmin):
+    # Fields to display in the list view
+    list_display = (
+        'username', 
+        'phone_number', 
+        'age', 
+        'gender', 
+        'religion', 
+        'caste',
+        'name'
+    )
+    
+    # Fields to search in the admin panel
+    search_fields = ('username', 'phone_number', 'name', 'religion', 'caste')
+    
+    # Filters for easier navigation
+    list_filter = ('gender', 'religion', 'caste')
+    
+    # Grouping fields in the admin edit page
+    fieldsets = (
+        ('User Information', {
+            'fields': ('username', 'password', 'phone_number', 'name', 'bio')
+        }),
+        ('Profile Images', {
+            'fields': ('profile_image', 'cover_image')
+        }),
+        ('Demographic Information', {
+            'fields': ('age', 'gender', 'religion', 'caste')
+        }),
+        ('Kundali Details', {
+            'fields': (
+                'birth_year', 'birth_month', 'birth_date',
+                'birth_hour', 'birth_minute', 'birth_second',
+                'birth_location', 'birth_latitude', 'birth_longitude', 
+                'kundali_svg'
+            )
+        }),
+    )
 
-admin.site.register(User, UserAdmin)
+    # Making some fields read-only
+    readonly_fields = ('kundali_svg',)
 
-# Register Profile model with a custom admin class for better display
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone_number', 'age', 'gender', 'religion', 'caste', 'bio', 'name')  # Customize the fields to display
-    search_fields = ('user__username',)  # Allow search by user's username
-    list_filter = ('gender', 'religion')  # Add filters by gender and religion
+    # Enabling save as new feature
+    save_as = True
 
-admin.site.register(Profile, ProfileAdmin)
 
-# Register Kundali model with a custom admin class
-class KundaliAdmin(admin.ModelAdmin):
-    list_display = ('user', 'birth_year', 'birth_month', 'birth_date', 'birth_location')  # Customize the fields to display
-    search_fields = ('user__username',)  # Allow search by user's username
-    list_filter = ('birth_location',)  # Add filter by birth location
-
-admin.site.register(Kundali, KundaliAdmin)
+# Register the model and admin configuration
+admin.site.register(UserDatabase, UserDatabaseAdmin)

@@ -1,41 +1,44 @@
-from faker import Faker
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
-from .models import UserDatabase  
+import os
+import django
 import random
+from faker import Faker
+from django.contrib.auth.hashers import make_password
+from .models import User, Profile  # Adjust to your app's name
+
+# Set up Django environment
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'biwah_bandhan.settings')  # Update with your project name
+django.setup()
 
 fake = Faker()
 
 # Function to simulate data
 def generate_fake_user_data(num_users):
     for _ in range(num_users):
-        # Generating random user data
-        username = fake.user_name()
+        username = fake.unique.user_name()
+        password = make_password("samplepw")  # Hashed password
+        user = User.objects.create(username=username, password=password)
+
         name = fake.name()
         bio = fake.text(max_nb_chars=50)
-        age = random.randint(18, 55)  
-        gender = random.choice([ 'Other'])
-        caste = random.choice(['Newar', 'Brahmin', 'Chhetri'])  # Update with actual options
-        religion = random.choice(['Hindu', 'Muslim', 'Christian','Buddhism','Jewish'])  # Update with actual options
-        phone_number = random.randint(1000000000, 9999999999)
-        password='samplepw'
-        # Generate a hashed password for the user
-        hashed_password = make_password(password)  # You can change the password as needed
-        
-        # Create or update the user in the database
-        user = UserDatabase.objects.create(
-            username=username,
+        age = random.randint(18, 55)
+        gender = random.choice(['Male', 'Female', 'Other'])
+        caste = random.choice(['Newar', 'Brahmin', 'Chhetri'])
+        religion = random.choice(['Hindu', 'Muslim', 'Christian', 'Buddhism', 'Jewish'])
+        phone_number = fake.phone_number()
+
+        profile = Profile.objects.create(
+            user=user,
             name=name,
             bio=bio,
             age=age,
             gender=gender,
             caste=caste,
             religion=religion,
-            phone_number=phone_number,
-            password=hashed_password,  # Already hashed
-            # Add other fields if needed
+            phone_number=phone_number
         )
-        user.save()
-        print(f"User {username} created.")
+        profile.save()
+        print(f"User {username} with profile created.")
 
-generate_fake_user_data(40)
+# Generate 40 fake users
+if __name__ == "__main__":
+    generate_fake_user_data(40)
