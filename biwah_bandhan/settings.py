@@ -26,12 +26,13 @@ SECRET_KEY = 'django-insecure-mi*ud26=1som1$$mh7+(_xi8ypprb=ngyr9jk$8_k3wyqzbl4x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','192.168.103.38', '192.168.121.221','192.168.137.117','192.168.137.117', '192.168.137.188','192.168.0.100','192.168.1.127','10.0.2.2','172.16.10.149','192.168.0.121','192.168.1.80','192.168.1.182','192.168.137.220','192.168.1.43','192.168.137.209','192.168.121.219','192.168.121.219','192.168.0.100']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','192.168.186.241','192.168.1.139']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,7 +42,17 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'biwah',
+    'chat',
 ]
+ASGI_APPLICATION = 'biwah_bandhan.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -1,4 +1,4 @@
-from .models import UserDatabase
+from chat.models import MatchRequest
 
 def calculate_weighted_score(user, profile, weights):
     score = 0

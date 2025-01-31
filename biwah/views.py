@@ -4,9 +4,11 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from .models import UserDatabase
+from chat.models import MatchRequest
 from .serializers import UserDatabaseSerializer
 from .weighted_score import calculate_weighted_score  
 import os
+from django.db.models import Q
 from kundali.Kundali import generate_kundali_svg
 
 # Helper to construct full image URLs
@@ -200,14 +202,28 @@ class MatchmakingView(APIView):
             opposite_gender = 'Female'
         elif current_user.gender == 'Female':
             opposite_gender = 'Male'
-        else:  # For 'Other'
+        else:  
             opposite_gender = 'Other'
 
 # Exclude the current user and filter by opposite gender
-        potential_matches = UserDatabase.objects.exclude(username=username).filter(gender=opposite_gender).order_by('?')[offset:offset + limit]
+        potential_matches = UserDatabase.objects.exclude(username=username).filter(gender=opposite_gender)
+        # Identify users who have any match requests with the current user
+        users_with_match_requests = MatchRequest.objects.filter(
+            Q(sender=current_user) | Q(receiver=current_user)
+        ).values_list('sender', 'receiver')
+
+        # Flatten the list of user IDs
+        user_ids_with_match_requests = set()
+        for sender_id, receiver_id in users_with_match_requests:
+            user_ids_with_match_requests.add(sender_id)
+            user_ids_with_match_requests.add(receiver_id)
+
+        # Exclude users who have any match requests with the current user
+        potential_matches = potential_matches.exclude(id__in=user_ids_with_match_requests)
 
         
-
+         # Order by random and apply pagination
+        potential_matches = potential_matches.order_by('?')[offset:offset + limit]
         
 
         # Calculate scores for potential matches
