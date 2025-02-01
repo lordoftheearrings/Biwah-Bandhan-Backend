@@ -227,7 +227,7 @@ class MatchmakingView(APIView):
     def get(self, request, username):
         # Extract offset and limit for pagination (default to 0 and 10)
         offset = int(request.query_params.get('offset', 0))
-        limit = int(request.query_params.get('limit', 15))
+        limit = int(request.query_params.get('limit', 13))
 
         try:
             # Get the current user

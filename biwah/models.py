@@ -11,8 +11,39 @@ class UserDatabase(models.Model):
         choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], 
         blank=True
     )  # Optional gender with predefined choices
-    religion = models.CharField(max_length=50, blank=True)  # Optional religion
-    caste = models.CharField(max_length=50, blank=True)  # Optional caste
+    religion = models.CharField(
+    max_length=50,
+    choices=[
+        ('Hindu', 'Hindu'),
+        ('Buddhist', 'Buddhist'),
+        ('Islam', 'Islam'),
+        ('Christian', 'Christian'),
+        ('Jain', 'Jain'),
+        ('Kiranti', 'Kiranti')
+    ],
+    blank=True)
+
+    caste = models.CharField(
+    max_length=50,
+    choices=[
+        ('Bahun', 'Bahun'),
+        ('Chhetri', 'Chhetri'),
+        ('Thakuri', 'Thakuri'),
+        ('Magar', 'Magar'),
+        ('Tharu', 'Tharu'),
+        ('Tamang', 'Tamang'),
+        ('Newar', 'Newar'),
+        ('Rai', 'Rai'),
+        ('Gurung', 'Gurung'),
+        ('Limbu', 'Limbu'),
+        ('Sherpa', 'Sherpa'),
+        ('Yadav', 'Yadav'),
+        ('Kami', 'Kami'),
+        ('Damai', 'Damai'),
+        ('Sarki', 'Sarki')
+    ],
+    blank=True)  # Optional caste with predefined choices
+
     bio = models.TextField(blank=True)  # Optional bio
     name = models.CharField(max_length=50, blank=True)  # Optional name
     
@@ -62,7 +93,18 @@ class UserDatabase(models.Model):
         blank=True
     )
 
-    education = models.TextField(blank=True)  # Education details (you can expand this if needed)
+    education = models.CharField(
+    max_length=50,
+    choices=[
+        ('SEE', 'SEE'),
+        ('High School or +2', 'High School or +2'),
+        ('Diploma', 'Diploma'),
+        ('Bachelors', 'Bachelors'),
+        ('Masters', 'Masters'),
+        ('PhD', 'PhD')
+    ],
+    blank=True)  # Optional education with predefined choices
+  
     profession = models.CharField(max_length=100, blank=True)  # Profession
     family_type = models.CharField(
         max_length=10, 
@@ -113,12 +155,18 @@ class UserDatabase(models.Model):
 class UserPreferences(models.Model):
     user = models.OneToOneField(UserDatabase, on_delete=models.CASCADE, related_name='preferences')
 
+    age_weight = models.IntegerField(null=True, blank=True)
     p_age_min = models.IntegerField(null=True, blank=True)  # Minimum age preference
     p_age_max = models.IntegerField(null=True, blank=True)  # Maximum age preference
 
+
+    religion_weight = models.IntegerField(null=True, blank=True)
     p_religion = models.CharField(max_length=50, blank=True)  # Preferred religion
+
+    caste_weight = models.IntegerField(null=True, blank=True)
     p_caste = models.CharField(max_length=50, blank=True)  # Preferred caste
 
+    gotra_weight = models.IntegerField(null=True, blank=True)
     p_gotra = models.CharField(
         max_length=50,
         choices=[
@@ -138,9 +186,14 @@ class UserPreferences(models.Model):
         blank=True
     )  # Preferred gotra
 
-    p_height = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred height in cm
-    p_weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred weight in kg
 
+    p_height_min = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred height in cm
+    p_height_max = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred height in cm
+    height_weight = models.IntegerField(null=True, blank=True)
+
+    p_weight_min = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred weight in kg
+    p_weight_max = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred weight in kg
+    weight_weight = models.IntegerField(null=True, blank=True)
 
     p_habits_drinking = models.CharField(
         max_length=20,
@@ -163,8 +216,3 @@ class UserPreferences(models.Model):
     def __str__(self):
         return f"Preferences for {self.user.username}"
     
-class WeightedScore (models.Model):
-
-
-    def __str__(self):
-        return f""
