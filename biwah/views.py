@@ -58,6 +58,19 @@ class UserLoginView(APIView):
                         "profile_image": build_image_url(user.profile_image),
                         "cover_image": build_image_url(user.cover_image),
                         "name": user.name,
+                        "gotra": user.gotra,
+                        "height": user.height,
+                        "weight": user.weight,
+                        "zodiac": user.zodiac,
+                        "education": user.education,
+                        "profession": user.profession,
+                        "family_type": user.family_type,
+                        "address": user.address,
+                        "complexion": user.complexion,
+                        "marital_status": user.marital_status,
+                        "habits_drinking": user.habits_drinking,
+                        "habits_eating": user.habits_eating,
+                        "habits_smoking": user.habits_smoking,
                     }
                 }, status=status.HTTP_200_OK)
             else:
@@ -120,6 +133,19 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
                 "profile_image": build_image_url(instance.profile_image),
                 "cover_image": build_image_url(instance.cover_image),
                 "kundali_svg":instance.kundali_svg,
+                "gotra": instance.gotra,
+                "height": instance.height,
+                "weight": instance.weight,
+                "zodiac": instance.zodiac,
+                "education": instance.education,
+                "profession": instance.profession,
+                "family_type": instance.family_type,
+                "address": instance.address,
+                "complexion": instance.complexion,
+                "marital_status": instance.marital_status,
+                "habits_drinking": instance.habits_drinking,
+                "habits_eating": instance.habits_eating,
+                "habits_smoking": instance.habits_smoking,
                 
             }
         }, status=status.HTTP_200_OK)
@@ -175,6 +201,19 @@ class UserProfileUpdateView2(generics.RetrieveUpdateAPIView):
                 "bio": instance.bio,
                 "profile_image": build_image_url(instance.profile_image),
                 "cover_image": build_image_url(instance.cover_image),
+                "gotra": instance.gotra,
+                "height": instance.height,
+                "weight": instance.weight,
+                "zodiac": instance.zodiac,
+                "education": instance.education,
+                "profession": instance.profession,
+                "family_type": instance.family_type,
+                "address": instance.address,
+                "complexion": instance.complexion,
+                "marital_status": instance.marital_status,
+                "habits_drinking": instance.habits_drinking,
+                "habits_eating": instance.habits_eating,
+                "habits_smoking": instance.habits_smoking,
                 
                 
             }
@@ -243,3 +282,72 @@ class MatchmakingView(APIView):
 
         # Return only the usernames
         return Response({"matches": [match['username'] for match in sorted_matches]}, status=status.HTTP_200_OK)
+    
+
+
+
+from django.core.paginator import Paginator, EmptyPage
+
+class SearchUserView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Get query parameters with proper validation
+        try:
+            search_term = request.query_params.get('search', '')
+            age_min = request.query_params.get('age_min', None)
+            age_max = request.query_params.get('age_max', None)
+            gender = request.query_params.get('gender', 'Any')
+            religion = request.query_params.get('religion', 'Any')
+            caste = request.query_params.get('caste', 'Any')
+            gotra = request.query_params.get('gotra', 'Any')
+            page_number = int(request.query_params.get('page', 1))
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Invalid query parameters."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Construct the queryset based on the search term and filters
+        users = UserDatabase.objects.all()
+
+        if search_term:
+            users = users.filter(
+                Q(username__icontains=search_term) | Q(name__icontains=search_term)
+            )
+
+        # Apply filters if they are not 'Any'
+        if gender != 'Any':
+            users = users.filter(gender=gender)
+
+        if religion != 'Any':
+            users = users.filter(religion=religion)
+
+        if caste != 'Any':
+            users = users.filter(caste=caste)
+
+        if gotra != 'Any':
+            users = users.filter(gotra=gotra)
+
+        if age_min is not None and age_max is not None:
+            users = users.filter(age__gte=age_min, age__lte=age_max)
+
+        users = users.order_by('id')  # Adjust ordering if needed
+
+        # Paginate the queryset
+        paginator = Paginator(users, 10)  # 10 users per page
+        try:
+            page_obj = paginator.page(page_number)
+        except EmptyPage:
+            return Response(
+                {"error": "Page number out of range."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Use serializer for consistent output
+        serializer = UserDatabaseSerializer(page_obj, many=True)
+
+        # Return paginated data
+        return Response({
+            "total_pages": paginator.num_pages,
+            "current_page": page_number,
+            "users": serializer.data
+        }, status=status.HTTP_200_OK)

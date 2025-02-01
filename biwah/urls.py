@@ -7,6 +7,7 @@ from .views import (
     UserLoginView,
     UserRegisterView,
     MatchmakingView,
+    SearchUserView,
 )
 from .kundali_views import GenerateKundaliView,RetrieveKundali
 from .guna_milan_views import AshtakootGunMilan
@@ -20,6 +21,7 @@ urlpatterns = [
     path('generate_kundali/', GenerateKundaliView.as_view(), name='generate_kundali'),
     path('retrieve_kundali/',RetrieveKundali.as_view(),name='retrieve_kundali'),
     path('ashtakoot/', AshtakootGunMilan.as_view(), name='ashtakoot'),  
+    path('search/', SearchUserView.as_view(), name='search'),  
     
 ]
 

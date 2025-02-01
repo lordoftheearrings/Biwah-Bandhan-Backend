@@ -31,6 +31,19 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
             'birth_latitude',
             'birth_longitude',
             'kundali_svg',  # Field for storing the Kundali SVG data
+            'gotra',  
+            'height',  
+            'weight',  
+            'zodiac',  
+            'education',  
+            'profession',  
+            'family_type',  
+            'address',  
+            'complexion',  
+            'marital_status',  
+            'habits_drinking',  
+            'habits_eating',  
+            'habits_smoking'
         ]
         extra_kwargs = {
             'password': {'write_only': True},
@@ -52,9 +65,21 @@ class UserDatabaseSerializer(serializers.ModelSerializer):
             'birth_location': {'required': False},
             'birth_latitude': {'required': False},
             'birth_longitude': {'required': False},
-            'kundali_svg': {'required': False},  # New field for storing SVG
+            'kundali_svg': {'required': False},  
+            'gotra': {'required': False},
+            'height': {'required': False},
+            'weight': {'required': False},
+            'zodiac': {'required': False},
+            'education': {'required': False},
+            'profession': {'required': False},
+            'family_type': {'required': False},
+            'address': {'required': False},
+            'complexion': {'required': False},
+            'marital_status': {'required': False},
+            'habits_drinking': {'required': False},
+            'habits_eating': {'required': False},
+            'habits_smoking': {'required': False},
         }
-
     def create(self, validated_data):
         # Hash the password before saving
         password = validated_data.pop('password')
