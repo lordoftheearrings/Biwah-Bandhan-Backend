@@ -10,6 +10,7 @@ from .weighted_score import calculate_weighted_score
 import os
 from django.db.models import Q
 from kundali.Kundali import generate_kundali_svg
+from django.core.paginator import Paginator, EmptyPage
 
 # Helper to construct full image URLs
 def build_image_url(image_field):
@@ -286,7 +287,7 @@ class MatchmakingView(APIView):
 
 
 
-from django.core.paginator import Paginator, EmptyPage
+
 
 class SearchUserView(APIView):
     def get(self, request, *args, **kwargs):
@@ -342,12 +343,17 @@ class SearchUserView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Use serializer for consistent output
-        serializer = UserDatabaseSerializer(page_obj, many=True)
-
-        # Return paginated data
-        return Response({
+        # Create a custom response with only the necessary fields
+        response_data = {
             "total_pages": paginator.num_pages,
             "current_page": page_number,
-            "users": serializer.data
-        }, status=status.HTTP_200_OK)
+            "users": [
+                {
+                    "username": user.username,
+                }
+                for user in page_obj
+            ]
+        }
+
+        # Return paginated data
+        return Response(response_data, status=status.HTTP_200_OK)

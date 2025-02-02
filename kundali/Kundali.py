@@ -1,6 +1,6 @@
 from immanuel import charts
 from datetime import datetime
-from kundali.template import lagna_kundali_defn as chart
+from .template import lagna_kundali_defn as chart
 
 def get_planets_and_houses_with_asc(year: int, month: int, day: int, hour: int, minute: int,
                                     second: int, latitude: float, longitude: float):

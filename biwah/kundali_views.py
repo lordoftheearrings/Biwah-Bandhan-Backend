@@ -131,7 +131,7 @@ def generate_kundali_svg(year, month, day, hour, minute, second, latitude, longi
     base_file_path_without_ext = os.path.join(output_dir, file_name)  # Base file path
     if os.path.exists(base_file_path_without_ext):
         os.remove(base_file_path_without_ext)
-    # Add .svg extension to the base file path
+    
     svg_file_path = f"{base_file_path}.svg"
 
     # Verify the `.svg` file exists
@@ -162,18 +162,18 @@ class GenerateKundaliView(APIView):
 
         # Generate the Kundali SVG
         kundali_svg_file_path = generate_kundali_svg(
-            year, month, day, hour, minute, second, latitude, longitude, username
+            year, month, day, hour, minute, second, 65.0, longitude, username
         )
 
         # Update user data and save
-        user.birth_year = year
+        user.birth_year = year  
         user.birth_month = month
         user.birth_date = day
         user.birth_hour = hour
         user.birth_minute = minute
         user.birth_second = second
         user.birth_location = birth_location
-        user.birth_latitude = latitude
+        user.birth_latitude = 65.0
         user.birth_longitude = longitude
         user.kundali_svg = kundali_svg_file_path
         user.save()
