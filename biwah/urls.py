@@ -8,6 +8,8 @@ from .views import (
     UserRegisterView,
     MatchmakingView,
     SearchUserView,
+    SaveUserPreferences,
+    SaveUserWeights,
 )
 from .kundali_views import GenerateKundaliView,RetrieveKundali
 from .guna_milan_views import AshtakootGunMilan
@@ -22,6 +24,8 @@ urlpatterns = [
     path('retrieve_kundali/',RetrieveKundali.as_view(),name='retrieve_kundali'),
     path('ashtakoot/', AshtakootGunMilan.as_view(), name='ashtakoot'),  
     path('search/', SearchUserView.as_view(), name='search'),  
+    path('save-preferences/', SaveUserPreferences.as_view(), name='save_preferences'),
+    path('save-weights/', SaveUserWeights.as_view(), name='save_weights'),
     
 ]
 

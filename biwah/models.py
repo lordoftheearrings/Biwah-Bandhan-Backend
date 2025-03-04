@@ -71,8 +71,8 @@ class UserDatabase(models.Model):
         blank=True
     )
     
-    height = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Height in cm
-    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Weight in kg
+    height = models.IntegerField(null=True, blank=True)  # Height in cm
+    weight = models.IntegerField(null=True, blank=True)  # Weight in kg
 
     zodiac = models.CharField(
         max_length=20, 
@@ -187,12 +187,12 @@ class UserPreferences(models.Model):
     )  # Preferred gotra
 
 
-    p_height_min = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred height in cm
-    p_height_max = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred height in cm
+    p_height_min = models.IntegerField( null=True, blank=True)  # Preferred height in cm
+    p_height_max = models.IntegerField( null=True, blank=True)  # Preferred height in cm
     height_weight = models.IntegerField(null=True, blank=True)
 
-    p_weight_min = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred weight in kg
-    p_weight_max = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Preferred weight in kg
+    p_weight_min = models.IntegerField( null=True, blank=True)  # Preferred weight in kg
+    p_weight_max = models.IntegerField( null=True, blank=True)  # Preferred weight in kg
     weight_weight = models.IntegerField(null=True, blank=True)
 
     p_habits_drinking = models.CharField(

@@ -236,6 +236,13 @@ class MatchmakingView(APIView):
         except UserDatabase.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        user_preferences = UserPreferences.objects.get(user=current_user)
+         # Fetch user preferences from the database
+        # try:
+        #     user_preferences = UserPreferences.objects.get(user=current_user)
+        # except UserPreferences.DoesNotExist:
+        #     return Response({"message": "User preferences not found"}, status=status.HTTP_404_NOT_FOUND)
+        
         # Determine the opposite gender
         # Determine the opposite gender
         if current_user.gender == 'Male':
@@ -266,16 +273,37 @@ class MatchmakingView(APIView):
         potential_matches = potential_matches.order_by('?')[offset:offset + limit]
         
 
-        # Calculate scores for potential matches
+        # Fetch weights from the user preferences model
         weights = {
-            'age': 10,
-            'religion': 10,
-            'caste': 5,
+            'age': user_preferences.age_weight or 10,  # Use 10 as default if not specified
+            'religion': user_preferences.religion_weight or 10,  # Use 10 as default if not specified
+            'caste': user_preferences.caste_weight or 5,  # Use 5 as default if not specified
+            'height': user_preferences.height_weight or 5,  # Optional: add height weight
+            'weight': user_preferences.weight_weight or 5,  # Optional: add weight weight
+            'gotra': user_preferences.gotra_weight or 10,  
+            'habits': 5,  
         }
+
+        # Preferences from the user preferences model
+        preferences = {
+            'age_min': user_preferences.p_age_min,
+            'age_max': user_preferences.p_age_max,
+            'religion': user_preferences.p_religion,
+            'caste': user_preferences.p_caste,
+            'gotra': user_preferences.p_gotra,
+            'height_min': user_preferences.p_height_min,
+            'height_max': user_preferences.p_height_max,
+            'weight_min': user_preferences.p_weight_min,
+            'weight_max': user_preferences.p_weight_max,
+            'drinking': user_preferences.p_habits_drinking,
+            'eating': user_preferences.p_habits_eating,
+            'smoking': user_preferences.p_habits_smoking
+        }
+
 
         matches = []
         for user in potential_matches:
-            score = calculate_weighted_score(current_user, user, weights)
+            score = calculate_weighted_score(current_user, user, weights,preferences)
             matches.append({'username': user.username, 'score': score})
 
         # Sort matches by compatibility score (ascending order for best matches)
@@ -357,3 +385,75 @@ class SearchUserView(APIView):
 
         # Return paginated data
         return Response(response_data, status=status.HTTP_200_OK)
+    
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import UserPreferences
+from .serializers import UserPreferencesSerializer
+
+
+class SaveUserPreferences(APIView):
+    def post(self, request, *args, **kwargs):
+        user = UserDatabase.objects.get(username=request.data['username'])  # Get user by username
+        preferences_data = {
+            'user': user,
+            
+            'p_age_min': request.data.get('p_age_min', None),
+            'p_age_max': request.data.get('p_age_max', None),
+
+            'p_religion': request.data.get('p_religion', None),
+
+            
+            'p_caste': request.data.get('p_caste', None),
+
+            
+            'p_gotra': request.data.get('p_gotra', None),
+
+            'p_height_min': request.data.get('p_height_min', None),
+            'p_height_max': request.data.get('p_height_max', None),
+
+            
+            'p_weight_min': request.data.get('p_weight_min', None),
+            'p_weight_max': request.data.get('p_weight_max', None),
+
+            'p_habits_drinking': request.data.get('p_habits_drinking', None),
+            'p_habits_eating': request.data.get('p_habits_eating', None),
+            'p_habits_smoking': request.data.get('p_habits_smoking', None),
+        }
+        
+        preferences, created = UserPreferences.objects.update_or_create(
+            user=user,
+            defaults=preferences_data
+        )
+        
+        if created:
+            return Response({"message": "Preferences saved successfully!"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": "Preferences updated successfully!"}, status=status.HTTP_200_OK)
+
+
+class SaveUserWeights(APIView):
+    def post(self, request, *args, **kwargs):
+        user = UserDatabase.objects.get(username=request.data['username'])  # Get user by username
+        weight_data = {
+            'user': user,
+            'age_weight': request.data.get('age_weight', None),
+            'religion_weight': request.data.get('religion_weight', None),
+            'caste_weight': request.data.get('caste_weight', None),
+            'gotra_weight': request.data.get('gotra_weight', None),
+            'height_weight': request.data.get('height_weight', None),
+            'weight_weight': request.data.get('weight_weight', None),
+
+        }
+        
+        preferences, created = UserPreferences.objects.update_or_create(
+            user=user,
+            defaults=weight_data
+        )
+        
+        if created:
+            return Response({"message": "Weights saved successfully!"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": "Weights updated successfully!"}, status=status.HTTP_200_OK)

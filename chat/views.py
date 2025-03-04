@@ -75,15 +75,7 @@ class CancelMatchRequestView(APIView):
         # Delete the match request
         match_request.delete()
 
-        # Notify the sender and receiver
-        Notification.objects.create(
-            user=sender,
-            message=f"Your match request to {receiver.username} has been canceled."
-        )
-        Notification.objects.create(
-            user=receiver,
-            message=f"{sender.username} has canceled the match request."
-        )
+        
 
         return Response({"message": "Match request canceled successfully."}, status=status.HTTP_200_OK)
 
@@ -323,3 +315,43 @@ class GetMessagesView(APIView):
             for message in messages
         ]
         return Response({"messages_data": messages_data}, status=status.HTTP_200_OK)
+    
+
+
+class FetchNotificationsView(APIView):
+    """
+    Handles fetching notifications for a specific user.
+    """
+    def get(self, request):
+        username = request.query_params.get('username')
+
+        if not username:
+            return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = UserDatabase.objects.get(username=username)
+        except UserDatabase.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Fetch notifications for the user
+        notifications = Notification.objects.filter(user=user).order_by('-created_at')
+
+        # Filter notifications for new match requests, accepted, or declined match requests
+        notifications_data = [
+            {
+                "id": notification.id,
+                "title": "Match Request Received" if "sent you a match request" in notification.message else
+                         "Match Request Accepted" if "accepted your match request" in notification.message else
+                         "Match Request Declined" if "declined your match request" in notification.message else
+                         "Notification",
+                "description": notification.message,
+                "time": notification.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                "is_read": notification.is_read
+            }
+            for notification in notifications
+            if ("sent you a match request" in notification.message or
+                "accepted your match request" in notification.message or
+                "declined your match request" in notification.message)
+        ]
+
+        return Response({"notifications": notifications_data}, status=status.HTTP_200_OK)

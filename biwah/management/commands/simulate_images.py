@@ -5,8 +5,8 @@ from django.core.management.base import BaseCommand
 from biwah.models import UserDatabase  # Adjust this based on your actual model
 
 # List of profile images for male, female, and other genders (stored in the 'media/profile_images/' folder)
-male_images = ['hittler.jpg', 'male2.jpg', 'mao.jpg', 'modi.jpg', 'oli.jpg', 'putin.jpg', 'stalin.jpg', 'Screenshot (83).png']
-female_images = ['f1.jpg', 'f2.jpg', 'f3.jpg', 'f4.jpg', 'f5.jpg', 'f6.jpg', 'syd.jpg', 'ana.jpg']
+male_images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg']
+female_images = ['f1.jpg', 'f2.jpg', 'f3.jpg', 'f4.jpg', 'f5.jpg']
 
 # Define the base directory for profile images and cover images
 PROFILE_IMAGE_DIR = 'C:/Users/Hp/Documents/Biwah Bandhan Backend/biwah_bandhan/media/profile_images/'
@@ -27,11 +27,11 @@ def update_profile_images():
     for user in users:
         # Check the user's gender and assign a random profile image
         if user.gender == 'Male':
-            user.profile_image = build_full_path('profile_shrijal.jpg', "profile")  # Full local path for profile image
+            user.profile_image = build_full_path('boy.jpg', "profile")  # Full local path for profile image
         elif user.gender == 'Female':
-            user.profile_image = build_full_path('gal.jpg', "profile")  # Full local path for profile image
+            user.profile_image = build_full_path('girl.jpg', "profile")  # Full local path for profile image
         elif user.gender == 'Other':
-            user.profile_image = build_full_path('1000377902.jpg', "profile")  # Default image for Other gender
+            user.profile_image = build_full_path('other.jpg', "profile")  # Default image for Other gender
 
         # Save the updated profile image back to the database
         user.save()
@@ -49,7 +49,7 @@ def update_cover_image():
             random_image = random.choice(female_images)
             user.cover_image = build_full_path(random_image, "cover")  # Full local path for cover image
         elif user.gender == 'Other':
-            user.cover_image = build_full_path('geh.jpg', "cover")  # Default cover image for Other gender
+            user.cover_image = build_full_path('other_c.jpg', "cover")  # Default cover image for Other gender
 
         # Save the updated cover image back to the database
         user.save()

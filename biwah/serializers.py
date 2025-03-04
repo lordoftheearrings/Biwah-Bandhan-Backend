@@ -208,3 +208,11 @@ class GunaMilanSerializer(serializers.Serializer):
     second_girl = serializers.IntegerField()
     latitude_girl = serializers.FloatField()
     longitude_girl = serializers.FloatField()
+
+from rest_framework import serializers
+from .models import UserPreferences
+
+class UserPreferencesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPreferences
+        fields = '__all__'

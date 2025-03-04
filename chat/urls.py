@@ -9,6 +9,7 @@ from .views import (
     FetchChatRoomsView,
     #SendMessageView,
     GetMessagesView,
+    FetchNotificationsView,
 )
 
 urlpatterns = [
@@ -21,5 +22,6 @@ urlpatterns = [
     path('fetch-chat-rooms/', FetchChatRoomsView.as_view(), name='fetch-chat-rooms'),
     #path('send-message/', SendMessageView.as_view(), name='send-message'),
     path('get-messages/', GetMessagesView.as_view(), name='get-messages'),
+    path('notifications/', FetchNotificationsView.as_view(), name='fetch-notifications'),
     
 ]
